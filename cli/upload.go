@@ -18,6 +18,14 @@ var (
 	uploadFile   string
 )
 
+const (
+	defaultProvider    = "aliyun"
+	defaultAliEndpoint = "oss-cn-guangzhou.aliyuncs.com"
+	defaultAliBucket   = "wecloud-station"
+	defaultAliAK       = "xxx"
+	defaultAliSK       = "xxx"
+)
+
 var UploadCmd = &cobra.Command{
 	Use:     "upload",
 	Long:    "upload 上传文件到云商",
@@ -31,11 +39,13 @@ var UploadCmd = &cobra.Command{
 
 		switch ossProvider {
 		case "aliyun":
-			uploader, err = aliyun.NewAliOssStore(&aliyun.Options{
+			aliOpts := &aliyun.Options{
 				Endpoint:     ossEndpoint,
 				AccessKey:    accessKey,
 				AccessSecret: accessSecret,
-			})
+			}
+			setAliDefault(aliOpts)
+			uploader, err = aliyun.NewAliOssStore(aliOpts)
 		case "tencent":
 			uploader = tencent.NewTencentOssStore()
 		case "aws":
@@ -54,13 +64,23 @@ var UploadCmd = &cobra.Command{
 	},
 }
 
+func setAliDefault(opts *aliyun.Options) {
+	if opts.AccessKey == "" {
+		opts.AccessKey = defaultAliAK
+	}
+
+	if opts.AccessSecret == "" {
+		opts.AccessSecret = defaultAliSK
+	}
+}
+
 func init() {
 	f := UploadCmd.PersistentFlags()
-	f.StringVarP(&ossProvider, "provider", "p", "aliyun", "oss storage provider[aliyun/tencent/aws]")
-	f.StringVarP(&ossEndpoint, "endpoint", "e", "oss-cn-guangzhou.aliyuncs.com", "oss storage provider endpoint")
+	f.StringVarP(&ossProvider, "provider", "p", defaultProvider, "oss storage provider[aliyun/tencent/aws]")
+	f.StringVarP(&ossEndpoint, "endpoint", "e", defaultAliEndpoint, "oss storage provider endpoint")
 	f.StringVarP(&accessKey, "access_key", "k", "", "oss storage provider ak")
 	f.StringVarP(&accessSecret, "access_secret", "s", "", "oss storage provider sk")
-	f.StringVarP(&bucketName, "bucket_name", "b", "wecloud-station", "oss storage provider bucket name")
+	f.StringVarP(&bucketName, "bucket_name", "b", defaultAliBucket, "oss storage provider bucket name")
 	f.StringVarP(&uploadFile, "upload_file", "f", "", "upload file name")
 	RootCmd.AddCommand(UploadCmd)
 }
