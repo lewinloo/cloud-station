@@ -30,7 +30,7 @@ func TestUpload(t *testing.T) {
 }
 
 func init() {
-	ali, err := aliyun.NewAliOssStore(OssEndpoint, AccessKey, AccessSecret)
+	ali, err := aliyun.NewDefaultAliOssStore()
 	if err != nil {
 		panic(err)
 	}

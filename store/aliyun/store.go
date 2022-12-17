@@ -2,6 +2,7 @@ package aliyun
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"github.com/lewinloo/cloud-station/store"
@@ -12,12 +13,37 @@ var (
 	_ store.Uploader = &AliOssStore{}
 )
 
+type Options struct {
+	Endpoint     string
+	AccessKey    string
+	AccessSecret string
+}
+
+func (o *Options) Validate() error {
+	if o.Endpoint == "" || o.AccessKey == "" || o.AccessSecret == "" {
+		return fmt.Errorf("endpoint, accessKey, accessSecret has one empty")
+	}
+	return nil
+}
+
 type AliOssStore struct {
 	client *oss.Client
 }
 
-func NewAliOssStore(endpoint, accessKey, accessSecret string) (*AliOssStore, error) {
-	c, err := oss.New(endpoint, accessKey, accessSecret)
+func NewDefaultAliOssStore() (*AliOssStore, error) {
+	return NewAliOssStore(&Options{
+		Endpoint:     os.Getenv("ALI_OSS_ENDPOINT"),
+		AccessKey:    os.Getenv("ALI_AK"),
+		AccessSecret: os.Getenv("ALI_SK"),
+	})
+}
+
+func NewAliOssStore(opts *Options) (*AliOssStore, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
+
+	c, err := oss.New(opts.Endpoint, opts.AccessKey, opts.AccessSecret)
 	if err != nil {
 		return nil, err
 	}
