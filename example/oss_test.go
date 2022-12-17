@@ -39,12 +39,12 @@ func TestBucketList(t *testing.T) {
 }
 
 func TestUploadFile(t *testing.T) {
-  bucket, err := client.Bucket("my-bucket")
+  bucket, err := client.Bucket(BucketName)
     if err != nil {
       t.Log(err)
     }
 
-    err = bucket.PutObjectFromFile("my-object", "LocalFile")
+    err = bucket.PutObjectFromFile("mydir/test.go", "oss_test.go")
     if err != nil {
       t.Log(err)
     }
