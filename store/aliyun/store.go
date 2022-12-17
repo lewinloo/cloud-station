@@ -26,10 +26,6 @@ func (o *Options) Validate() error {
 	return nil
 }
 
-type AliOssStore struct {
-	client *oss.Client
-}
-
 func NewDefaultAliOssStore() (*AliOssStore, error) {
 	return NewAliOssStore(&Options{
 		Endpoint:     os.Getenv("ALI_OSS_ENDPOINT"),
@@ -48,6 +44,10 @@ func NewAliOssStore(opts *Options) (*AliOssStore, error) {
 		return nil, err
 	}
 	return &AliOssStore{client: c}, nil
+}
+
+type AliOssStore struct {
+	client *oss.Client
 }
 
 func (s *AliOssStore) Upload(bucketName, objectKey, fileName string) error {
