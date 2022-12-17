@@ -74,6 +74,7 @@ Usage: cloud-station [-h] -f <upload_file_path>
 Options:
 `)
 
+	// 打印有哪些参数可以使用
 	flag.PrintDefaults()
 }
 
